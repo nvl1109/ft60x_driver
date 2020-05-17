@@ -11,9 +11,10 @@ void udp_callback(int fd, short event, void *arg)
 {
 	int val;
 
+	printf("Got event %d\n", event);
 	char *buf = malloc(1024 * 128);
 	val = read(fd, buf, 4096);
-	printf("GOT EVENT %d!\n", val);
+	printf("READ EVENT %d, len %d!\n", event, val);
 
 	if (val > 0)
 		write(fd, buf, val);
@@ -42,16 +43,26 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	printf("Event created!\n");
+
 	ev = event_new(base, in, EV_READ | EV_PERSIST, &udp_callback, NULL);
 	event_add(ev, NULL);
+	printf("Event registered!\n");
 
 	write(in, buf, 2048);
+	printf("Write 1\n");
 	write(in, buf, 2048);
+	printf("Write 2\n");
 	write(in, buf, 2048);
+	printf("Write 3\n");
 	write(in, buf, 2048);
+	printf("Write 4\n");
 
 	event_base_dispatch(base);
+	printf("event dispatch\r\n");
 	event_base_free(base);
+
+	printf("DONE!!!\r\n");
 
 	return 0;
 }
